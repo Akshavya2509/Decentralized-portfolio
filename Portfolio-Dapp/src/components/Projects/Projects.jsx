@@ -14,7 +14,19 @@ const Project = ({state}) => {
         }
         contract && projectDetails();
     }, [state])
-
+    const donateEth = async() => {
+        event.preventDefault();
+        try{
+            const [contract, web3] = state;
+            const eth = document.querySelector("#eth").value;
+            const weiValue = web3.utils.toWei(eth, "ether");
+            const accounts = await web3.eth.getAccounts();
+            await contract.methods.donate().send({from: accounts[0], value: weiValue, gas: 480000});
+            alert("Transaction successfull");
+        }catch(err){
+            alert("Transaction unsuccessfull\n ERROR_CODE: ", err);
+        }
+    }
     return (
         <section className = "project-section">
             <h1 className = "title"> Projects: </h1>
@@ -34,6 +46,26 @@ const Project = ({state}) => {
                 })}
                 
             </div>
+            <Modal size='md' isOpen={modal} toggle={() => setModal(!modal)}>
+                        <ModalHeader toggle={() => setModal(!modal)}>
+                            Enter the ETH you want to donate!
+                        </ModalHeader>
+                        <ModalBody>
+                            <form onSubmit={donateEth}>
+                                <Row>
+                                    <input id="eth" type="text" />
+                                        <Button className='mt-4' >
+                                            Send
+                                        </Button>
+                                </Row>
+                            </form>
+                        </ModalBody>
+                    </Modal>
+                    {/*  =========popup bootstrap end==========  */}
+                    <p className='donate' onClick={() => setModal(true)}>Liked the project's ? Consider donating Eth's <FaDonate className='icon' /></p>
+       
         </section>
     )
 }
+
+export default Project;
